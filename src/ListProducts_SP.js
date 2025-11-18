@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 
+// ✅ SỬA LỖI: Thêm hằng số URL cơ sở của bạn tại đây
+// Hãy chắc chắn rằng 'gietauwhxqhqfhuhleto' là Project Ref và 'img' là tên Bucket CÔNG KHAI (Public) của bạn
+const SUPABASE_STORAGE_URL = "https://gietauwhxqhqfhuhleto.supabase.co/storage/v1/object/public/img/";
+
 const ListProducts_SP = () => {
   const [listProduct, setListProduct] = useState([]);
   const navigate = useNavigate();
@@ -11,10 +15,15 @@ const ListProducts_SP = () => {
       try {
         const { data, error } = await supabase
           .from("products")
-          .select("*")
+          .select("*") // Lấy trực tiếp cột image
           .order("id", { ascending: true });
+
         if (error) throw error;
-        setListProduct(data);
+        
+        // Kiểm tra xem dữ liệu trả về có gì
+        console.log("Dữ liệu sản phẩm từ Supabase:", data); 
+        
+        setListProduct(data); // data.image sẽ chứa đường dẫn tương đối (ví dụ: 'products/file.jpg')
       } catch (err) {
         console.error("Lỗi khi lấy dữ liệu:", err.message);
       }
@@ -69,7 +78,8 @@ const ListProducts_SP = () => {
               }}
             >
               <img
-                src={p.image}
+                // ✅ Cú pháp JSX này đã ĐÚNG
+                src={`${SUPABASE_STORAGE_URL}${p.image}`} 
                 alt={p.title}
                 style={{
                   width: "100%",
